@@ -13,20 +13,20 @@ namespace FDP.OrderService.Test.JsonData
             string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonData","Orders.json");
 
             // deserialize JSON from a file      var message = JsonConvert 
-            var orders = JsonConvert.DeserializeObject<List<Order>>(jsonFilePath);
+            var orders = JsonConvert.DeserializeObject<List<Order>>(File.ReadAllText(jsonFilePath));
            
             return orders;
              
         }
 
-        public static IList<Order> Order1s()
+        public static IList<User> Users()
         {
-            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonData", "Orders.json");
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "JsonData", "Users.json");
 
             // deserialize JSON from a file      var message = JsonConvert 
-            var orders = JsonConvert.DeserializeObject<List<Order>>(jsonFilePath);
+            var users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(jsonFilePath));
 
-            return orders; 
+            return users; 
 
         } 
     }
