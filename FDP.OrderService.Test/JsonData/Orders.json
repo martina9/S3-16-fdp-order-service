@@ -1,0 +1,28 @@
+﻿{ // Order
+  "Id": 1,
+  "UserId": 33,
+  "Address":"VIA del centenario",
+  "City": "PESARO",
+  "PhoneNumber": "044554458",
+  "Email": "test@email.com",
+  "DeliveryType": "PICKUP",
+  "CreateDate": "2017-09-25T12:04:00",
+  "Amount": 345.12,
+  "Products": [
+    {
+      "Id": 1,
+      "ProductId": 3,
+      "Quantity": 2,
+      "OrderId": 22,
+      "Order": null
+    },
+    {
+      "Id": 2,
+      "ProductId": 4,
+      "Quantity": 3,
+      "OrderId": 22,
+      "Order": null
+    }
+  ]
+}
+ 
