@@ -22,7 +22,8 @@ namespace FDP.OrderService.Test
     {
         public IBus bus;
         private OrderService.Data.OrderDataContext dataContext;
-        private IList<Order> Orders;
+        private IList<Order> _orders;
+        private IList<User> _users;
 
         [TestInitialize]
         public void Init()
@@ -42,53 +43,28 @@ namespace FDP.OrderService.Test
             }
 
             // create test data
-            this.Orders = JsonLoad.Orders(); 
-
+            this._orders = JsonLoad.Orders();
+            this._users = JsonLoad.Users();
             // setup DbSet
-            var orders = A.Fake<DbSet<Order>>(o => o.Implements(typeof(IQueryable<Order>)).Implements(typeof(IDbAsyncEnumerable<Order>))).SetupData(this.Orders);
-           
+            var orders = A.Fake<DbSet<Order>>(o => o.Implements(typeof(IQueryable<Order>)).Implements(typeof(IDbAsyncEnumerable<Order>))).SetupData(this._orders); 
+            var users = A.Fake<DbSet<User>>(o => o.Implements(typeof(IQueryable<User>)).Implements(typeof(IDbAsyncEnumerable<User>))).SetupData(this._users);
             // arrange
             this.dataContext = A.Fake<OrderDataContext>();
             A.CallTo(() => dataContext.Orders).Returns(orders);
+            A.CallTo(() => dataContext.Users).Returns(users);
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void UserCreatedFound()
         {
-            var message = new  UserCreated();
-            message.Email = "test.test@test.com";
-            message.Username = "test.test";
-            var user = new UserCreatedPubSubSubScriber(bus);
-            var result = user.Consume(message);
-            result.Wait();
-        }
-
-        [TestMethod]
-        public void TestMethod2()
-        {
-            var message = new UserCreated();
-            message.Email = "test.test@test.com";
-            message.Username = "test.test";
-            bus.Publish(message); 
-        }
-         
-        [TestMethod]
-        public async Task<dynamic> Get_Price_From_ProductElment(dynamic obj)
-        { 
-            // act
-            var subscriber = new UserCreatedPubSubSubScriber(bus, this.dataContext);
-            var priceManager = new PriceManager(this.dataContext);
-
-            var price = await priceManager.GetTotalPrice(obj.Quantity, obj.DistributorCode, obj.SoftwareCode,
-                obj.ProductElementCode, obj.DateTime);
-
-            // assert
-            return new
+            var message = new UserCreated
             {
-                EUR = (double)price.Value.EUR,
-                GBP = (double)price.Value.GBP,
-                USD = (double)price.Value.USD
+                Email = "test@email.com",
+                Username = "test1"
             };
-        }
+            var user = new UserCreatedPubSubSubScriber(bus,dataContext);
+            user.Consume(message);  
+            Assert.Fail();
+        } 
     }
 }
