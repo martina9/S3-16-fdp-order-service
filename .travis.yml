@@ -1,0 +1,5 @@
+language: csharp
+solution: FDP.OrderService.sln
+install:
+  - sudo apt-get install -y gtk-sharp2
+  - nuget restore FDP.OrderService.sln
