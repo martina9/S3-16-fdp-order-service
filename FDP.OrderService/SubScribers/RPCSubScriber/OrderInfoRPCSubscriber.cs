@@ -8,11 +8,11 @@ using FDP.OrderService.DirectoryMessage.Response;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
-    public class UserInfoRPCSubscriber  : IResponder
+    public class OrderInfoRPCSubscriber  : IResponder
     {
         protected readonly IBus Bus;
 
-        public UserInfoRPCSubscriber(IBus bus)
+        public OrderInfoRPCSubscriber(IBus bus)
         {
             this.Bus = bus;
         }
@@ -34,7 +34,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
 
                 response.Id = order.Id;
                 response.Amount = order.Amount;
-                response.CreateDate = order.CreateDate;
+                response.ConfirmationDate = order.ConfirmationDate;
                 response.UserId = order.UserId;  
             }
 

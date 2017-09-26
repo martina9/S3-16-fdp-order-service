@@ -3,14 +3,13 @@
 namespace FDP.OrderService.Data.Migrations
 {
     public sealed class Configuration : DbMigrationsConfiguration<OrderDataContext>
+    {
+        public Configuration()
         {
-            public Configuration()
-            {
-                AutomaticMigrationsEnabled = true;
-                AutomaticMigrationDataLossAllowed = true;
-            }
-
-            protected override void Seed(OrderDataContext context) { }
+            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
         }
-    
+
+        protected override void Seed(OrderDataContext context) { }
+    }  
 }

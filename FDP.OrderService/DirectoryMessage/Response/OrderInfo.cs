@@ -18,7 +18,9 @@ namespace FDP.OrderService.DirectoryMessage.Response
 
         public int UserId { get; set; }
          
-        public DateTime CreateDate { get; set; }
+        public int RestaurantId { get; set; }
+
+        public DateTime ConfirmationDate { get; set; }
          
         public DeliveryType DeliveryType { get; set; }
 

@@ -131,6 +131,7 @@
     <Compile Include="DirectoryMessage\Message\UserCreated.cs" />
     <Compile Include="DirectoryMessage\Message\UserDeleted.cs" />
     <Compile Include="DirectoryMessage\Request\CalculatePrice.cs" />
+    <Compile Include="DirectoryMessage\Request\OrderList.cs" />
     <Compile Include="DirectoryMessage\Request\OrderInfo.cs" />
     <Compile Include="DirectoryMessage\Request\DeleteOrder.cs" />
     <Compile Include="DirectoryMessage\Request\ProductInfos.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="DirectoryMessage\Response\CalculatePrice.cs" />
     <Compile Include="DirectoryMessage\Response\OrderInfo.cs" />
     <Compile Include="DirectoryMessage\Response\DeleteOrder.cs" />
+    <Compile Include="DirectoryMessage\Response\OrderList.cs" />
     <Compile Include="DirectoryMessage\Response\ProductInfos.cs" />
     <Compile Include="DirectoryMessage\Response\UpdateOrder.cs" />
     <Compile Include="DirectoryMessage\Shared\Enum\DeliveryType.cs" />
@@ -159,12 +161,12 @@
     <Compile Include="SubScribers\PubSubSubscriber\UserCreatedPubSubSubScriber.cs" />
     <Compile Include="SubScribers\PubSubSubscriber\UserDeletedPubSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\DeleteUserRPCSubscriber.cs" />
+    <Compile Include="SubScribers\RPCSubScriber\OrderListRPCSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\UpdateUserRPCSubscriber.cs" />
-    <Compile Include="SubScribers\RPCSubScriber\UserInfoRPCSubscriber.cs" />
+    <Compile Include="SubScribers\RPCSubScriber\OrderInfoRPCSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\ConfirmOrderRPCSubscriber.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="PubSubscriber\" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +197,15 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\OrderServiceDataContext.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\OrderServiceDataContext_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>OrderServiceDataContext.mdf</DependentUpon>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

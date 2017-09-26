@@ -18,7 +18,7 @@ namespace FDP.OrderService
 
             using (OrderDataContext test = new OrderDataContext())
             {
-                var result = test.Users.FirstOrDefault();
+                var contex = test.Orders.FirstOrDefault();
             }
 
 

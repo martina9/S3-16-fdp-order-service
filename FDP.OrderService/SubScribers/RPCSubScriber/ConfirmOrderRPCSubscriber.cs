@@ -40,7 +40,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     Amount = request.Amount.Value,
                     Address = request.Address,
                     UserId = request.UserId,
-                    CreateDate = DateTime.Now,
+                    ConfirmationDate = DateTime.Now,
                     PhoneNumber = request.PhoneNumber,
                     Email = request.Email,
                     City = request.City,

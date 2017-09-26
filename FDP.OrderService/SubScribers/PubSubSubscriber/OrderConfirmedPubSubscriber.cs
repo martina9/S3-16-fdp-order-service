@@ -77,7 +77,7 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     Address = order.Address,
                     Amount = order.Amount,
                     City = order.City,
-                    CreateDate = order.CreateDate,
+                    CreateDate = order.ConfirmationDate,
                     DeliveryType = (FDP.OrderService.DirectoryMessage.Shared.Enum.DeliveryType)order.DeliveryType,
                     Email = order.Email,
                     PayedAmount = order.Amount,

@@ -14,21 +14,27 @@ namespace FDP.OrderService.Data.Model
 
         [Key]
         public int Id { get; set; }  
-                 
-        public int UserId { get; set; } 
+                  
+        public int UserId { get; set; }
 
+        public int RestaurantId { get; set; }
+
+        [StringLength(155)]
         public string Address { get; set; }
 
+        [StringLength(155)]
         public string City { get; set; }
 
+        [StringLength(155)]
         public string PhoneNumber { get; set; }
 
+        [StringLength(155)]
         public string Email { get; set; }
 
         public DeliveryType DeliveryType { get; set; }
 
         [Required]
-        public DateTime CreateDate { get; set; } 
+        public DateTime ConfirmationDate { get; set; } 
 
         [Required]
         public decimal Amount { get; set; }
