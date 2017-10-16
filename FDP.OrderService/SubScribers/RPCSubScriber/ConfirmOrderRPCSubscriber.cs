@@ -2,31 +2,31 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using EasyNetQ;
-using FDP.Infrastructure.Responders;
 using FDP.OrderService.Data;
 using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Message;
-using FDP.OrderService.DirectoryMessage.Response;
+using FDP.OrderService.MessageDirectory.Message;
+using FDP.OrderService.MessageDirectory.Response;
+using RawRabbit;
+using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
-    public class ConfirmOrderRPCSubscriber :  IResponder
+    public class ConfirmOrderRPCSubscriber : FDP.MessageService.Interface.IResponder
     {
-        protected readonly IBus Bus;
+        protected readonly IBusClient Bus;
 
-        public ConfirmOrderRPCSubscriber(IBus bus) 
+        public ConfirmOrderRPCSubscriber(IBusClient bus) 
         {
             this.Bus = bus;
         }
 
-        public async Task<ConfirmOrder> Response(DirectoryMessage.Request.ConfirmOrder request)
+        public async Task<ConfirmOrder> Response(MessageDirectory.Request.ConfirmOrder request, MessageContext context)
         {
             ConfirmOrder response = new ConfirmOrder();
              
-            using (OrderDataContext context = new OrderDataContext())
+            using (OrderDataContext dataContext = new OrderDataContext())
             { 
-                var user = await context.Users.SingleOrDefaultAsync(p => p.Id == request.UserId);
+                var user = await dataContext.Users.SingleOrDefaultAsync(p => p.Id == request.UserId);
 
                 if (user != null)
                 {
@@ -35,12 +35,22 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     throw ex;
                 }
 
+                var restaurant = await dataContext.Restaurants.SingleOrDefaultAsync(p => p.Id == request.RestaurantId);
+
+                if (restaurant != null)
+                {
+                    Exception ex = new Exception("Restaurant Doesnt not exist");
+                    ex.Data.Add("Id", request.RestaurantId);
+                    throw ex;
+                }
+
                 var order = new Order()
                 {
                     Amount = request.Amount.Value,
                     Address = request.Address,
-                    UserId = request.UserId,
-                    ConfirmationDate = DateTime.Now,
+                    User = user,
+                    Restaurant = restaurant,
+                    CreateDate = DateTime.Now,
                     PhoneNumber = request.PhoneNumber,
                     Email = request.Email,
                     City = request.City,
@@ -49,12 +59,12 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     {
                         ProductId = p.ProductId,
                         Quantity = p.Quantity
-                    }).ToList()                    
+                    }).ToList(),     
                 };
 
-                context.Orders.Add(order);
+                dataContext.Orders.Add(order);
 
-                await context.SaveChangesAsync();
+                await dataContext.SaveChangesAsync();
 
                 OrderConfirmed orderConfiremd = new OrderConfirmed()
                 {
@@ -69,7 +79,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
 
         public void Subscribe()
         {
-            this.Bus.RespondAsync<DirectoryMessage.Request.ConfirmOrder, ConfirmOrder>(this.Response);
+            this.Bus.RespondAsync<MessageDirectory.Request.ConfirmOrder, ConfirmOrder>(Response);
         }
     }
 }

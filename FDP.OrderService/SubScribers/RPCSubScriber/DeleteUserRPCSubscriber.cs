@@ -1,30 +1,30 @@
-﻿using System;
+﻿using FDP.OrderService.Data;
+using RawRabbit;
+using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
-using EasyNetQ;
-using FDP.Infrastructure.Responders;
-using FDP.OrderService.Data;
-using FDP.OrderService.DirectoryMessage.Message;
-using FDP.OrderService.DirectoryMessage.Response;
+using FDP.OrderService.MessageDirectory.Message;
+using FDP.OrderService.MessageDirectory.Response;
+using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
-    public class DeleteUserRPCSubscriber : IResponder
+    public class DeleteUserRPCSubscriber : FDP.MessageService.Interface.IResponder
     {
-        protected readonly IBus Bus;
+        protected readonly IBusClient Bus;
 
-        public DeleteUserRPCSubscriber(IBus bus)
+        public DeleteUserRPCSubscriber(IBusClient bus)
         {
             this.Bus = bus;
         }
 
-        public async Task<DeleteOrder> Response(DirectoryMessage.Request.DeleteOrder request)
+        public async Task<DeleteOrder> Response(MessageDirectory.Request.DeleteOrder request, MessageContext context)
         {
             DeleteOrder response = new DeleteOrder();
 
-            using (OrderDataContext context = new OrderDataContext())
+            using (OrderDataContext dataContext = new OrderDataContext())
             {
-                var order = await context.Orders.SingleOrDefaultAsync(p => p.Id == request.OrderId);
+                var order = await dataContext.Orders.SingleOrDefaultAsync(p => p.Id == request.OrderId);
                 if (order == null)
                 {
                     Exception ex = new Exception("Delete Order : Does not exist");
@@ -39,8 +39,8 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
 
                 response.Id = order.Id; 
                
-                context.Orders.Remove(order);
-                context.SaveChanges();
+                dataContext.Orders.Remove(order);
+                dataContext.SaveChanges();
 
                 await Bus.PublishAsync(orderDeleted);
             }
@@ -50,7 +50,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
 
         public void Subscribe()
         {
-            this.Bus.RespondAsync<DirectoryMessage.Request.DeleteOrder, DeleteOrder>(this.Response);
+            this.Bus.RespondAsync<MessageDirectory.Request.DeleteOrder, DeleteOrder>(this.Response);
         }
     }
 }

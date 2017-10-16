@@ -1,45 +1,30 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using EasyNetQ;
-using EasyNetQ.AutoSubscribe;
+using FDP.MessageService.Interface;
 using FDP.OrderService.Data;
 using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Message;
+using RawRabbit;
+using FDP.MessageService.Responders;
+using FDP.OrderService.MessageDirectory.Message;
+using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
-    public class UserCreatedPubSubSubScriber : IConsume<UserCreated>
+    public class UserCreatedPubSubSubScriber : IResponder
     {
-        protected readonly IBus Bus;
+        protected readonly IBusClient Bus;
 
-        protected OrderDataContext context;
-
-        public UserCreatedPubSubSubScriber(IBus bus)
-        {
+        public UserCreatedPubSubSubScriber(IBusClient bus)
+        { 
             this.Bus = bus;
-            this.context = new OrderDataContext();
         }
 
-        public UserCreatedPubSubSubScriber(IBus bus, OrderDataContext context)
+        public async Task Consume(UserCreated message, MessageContext context)
         {
-            this.Bus = bus;
-            this.context = context;
-        }
-
-        [AutoSubscriberConsumer(SubscriptionId = "Id")]
-        public void Consume(UserCreated message)
-        {
-            using (context)
+            using (OrderDataContext dataContext = new OrderDataContext())
             {
-                User user = context.Users.SingleOrDefault(p => p.Email == message.Email);
-                if (user != null)
-                {
-                    Exception ex = new Exception("Object Already Found");
-                    ex.Data.Add("Email",message.Email);
-                    ex.Data.Add("Username", message.Username);
-                    throw ex;
-                }
+                User user = dataContext.Users.SingleOrDefault(p => p.Email == message.Email);
+                if (user != null) return;
 
                 user = new User
                 {
@@ -48,10 +33,16 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     Username = message.Username
                 };
 
-                context.Users.Add(user);
+                dataContext.Users.Add(user);
 
-                context.SaveChanges(); 
+                await dataContext.SaveChangesAsync();
+
             }
+        }
+
+        public void Subscribe()
+        {
+            Bus.SubscribeAsync<UserCreated>(Consume);
         }
     }
 }

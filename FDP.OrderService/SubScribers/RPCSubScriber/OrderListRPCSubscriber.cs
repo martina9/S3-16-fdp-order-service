@@ -1,49 +1,49 @@
-﻿using System;
-using System.Data.Entity;
-using System.Threading.Tasks;
-using EasyNetQ;
-using FDP.Infrastructure.Responders;
-using FDP.OrderService.Data;
-using FDP.OrderService.DirectoryMessage.Response;
+﻿using System.Data.Entity;
 using System.Linq;
-using System.Collections.Generic;
-using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Shared.Enum;
+using System.Threading.Tasks;
+using FDP.OrderService.Data;
+using FDP.MessageService.Interface;
+using FDP.OrderService.MessageDirectory.Response;
+using RawRabbit;
+using RawRabbit.Context;
+using FDP.OrderService.MessageDirectory.Shared;
+using FDP.OrderService.MessageDirectory.Shared.Enum;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
-    public class OrderListRPCSubscriber : IResponder
+    public class OrderListRPCSubscriber  : IResponder
     {
-        protected readonly IBus Bus;
+        protected readonly IBusClient Bus;
 
-        public OrderListRPCSubscriber(IBus bus)
+        public OrderListRPCSubscriber(IBusClient bus)
         {
             this.Bus = bus;
         }
 
-        public OrderList Response(DirectoryMessage.Request.OrderList request)
+        public async Task<OrderList> Response(MessageDirectory.Request.OrderList request, MessageContext context)
         {
             OrderList response = new OrderList();
 
-            using (OrderDataContext context = new OrderDataContext())
-            { 
-                var orders =context.Orders.Where(p => (request.UserId == null || p.UserId == request.UserId) && (request.RestaurantId == null || p.RestaurantId == request.RestaurantId)).ToList();
+            using (OrderDataContext dataContext = new OrderDataContext())
+            {
+                var orders = await dataContext.Orders.Where(p => (request.UserId == null || p.User.Id == request.UserId) && (request.RestaurantId == null || p.Restaurant.Id == request.RestaurantId)).ToListAsync();
 
-                response.Items = orders.Select(o => new OrderInfo() {
-                UserId = o.UserId,RestaurantId = o.RestaurantId,Address =o.Address,
-                Amount = o.Amount, City = o.City, ConfirmationDate = o.ConfirmationDate,
-                DeliveryType =(DeliveryType) o.DeliveryType, Email = o.Email, Id = o.Id,  PhoneNumber = o.PhoneNumber ,
-                Products = o.Products.Select(p=>new FDP.OrderService.DirectoryMessage.Shared.Product() {
-                ProductId = p.ProductId , Quantity = p.Quantity}).ToList()
-                }).ToList(); 
+                response.Items = orders.Select(p => new Order()
+                {
+                    UserId = p.User.Id, Id = p.Id, PhoneNumber = p.PhoneNumber, Email = p.Email,Address = p.Address,
+                    Amount = p.Amount,City = p.City,CreateDate = p.CreateDate,DeliveryType = (DeliveryType)p.DeliveryType,Products = p.Products.Select(o=> new Product()
+                    {
+                        ProductId = o.ProductId,
+                        Quantity = o.Quantity
+                    }).ToList()
+                }).ToList();
             }
-
             return response;
         }
 
         public void Subscribe()
         {
-            this.Bus.Respond<DirectoryMessage.Request.OrderList, OrderList>(this.Response);
+            this.Bus.RespondAsync<MessageDirectory.Request.OrderList, OrderList>(this.Response);
         }
     }
 }

@@ -1,44 +1,40 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using EasyNetQ;
-using EasyNetQ.AutoSubscribe;
 using FDP.OrderService.Data;
 using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Message;
-using FDP.OrderService.DirectoryMessage.Request;
-using FDP.OrderService.DirectoryMessage.Shared;
+using FDP.MessageService.Responders;
+using RawRabbit;
+using System.Threading.Tasks;
+using FDP.MessageService.Interface;
+using FDP.OrderService.MessageDirectory.Message;
+using FDP.OrderService.MessageDirectory.Request;
+using FDP.OrderService.MessageDirectory.Shared;
+using FDP.OrderService.MessageDirectory.Shared.Enum;
+using RawRabbit.Context;
+using Product = FDP.OrderService.MessageDirectory.Shared.Product;
+using ProductInfo = FDP.OrderService.MessageDirectory.Request.ProductInfo;
 
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
-    public class OrderConfirmedPubSubscriber : IConsume<OrderConfirmed>
+    public class OrderConfirmedPubSubscriber :  IResponder
     {
-        protected readonly IBus Bus;
-        protected OrderDataContext context;
+        protected readonly IBusClient Bus;
 
-        public OrderConfirmedPubSubscriber(IBus bus)
+        public OrderConfirmedPubSubscriber(IBusClient bus)
         { 
             this.Bus = bus;
-            this.context = new OrderDataContext();
-        }
-
-        public OrderConfirmedPubSubscriber(IBus bus, OrderDataContext context)
-        {
-            this.Bus = bus;
-            this.context = context;
         }
 
         /// <summary>
         /// Message to recive a Confirmed Order , Calculate the price and let 
         /// </summary>
         /// <param name="message"></param>
-        /// <returns></returns>
-        [AutoSubscriberConsumer(SubscriptionId = "Id")]
-        public void Consume(OrderConfirmed message)
+        /// <returns></returns> 
+        public async Task Consume(OrderConfirmed message,MessageContext context)
         {
-            using (context)
+            using (OrderDataContext dataContext = new OrderDataContext())
             {
-                Order order = context.Orders.SingleOrDefault(p => p.Id == message.Id);
+                Data.Model.Order order = dataContext.Orders.SingleOrDefault(p => p.Id == message.Id);
                 if (order == null)
                 {
                     Exception ex = new Exception("Order not found");
@@ -49,36 +45,36 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                
                 var calcualtePrice = new CalculatePrice()
                 {
-                    Products = order.Products.Select(p => new FDP.OrderService.DirectoryMessage.Shared.Product()
+                    Products = order.Products.Select(p => new Product()
                     {
                         ProductId = p.Id,
                         Quantity = p.Quantity
                     }).ToList()
                 };
 
-                var calculatedPrice = Bus.Request<CalculatePrice, FDP.OrderService.DirectoryMessage.Response.CalculatePrice>(calcualtePrice);
+                var calculatedPrice = await Bus.RequestAsync<CalculatePrice, MessageDirectory.Response.CalculatePrice>(calcualtePrice);
 
                 order.Amount = calculatedPrice.TotalAmount;
 
-                context.SaveChanges();
+                dataContext.SaveChanges();
 
 
-                var products = order.Products.Select(o => new FDP.OrderService.DirectoryMessage.Shared.Product() { ProductId = o.ProductId, Quantity = o.Quantity }).ToList();
+                var products = order.Products.Select(o => new Product() { ProductId = o.ProductId, Quantity = o.Quantity }).ToList();
 
-                var reqProductionInfos = new ProductInfos()
+                var reqProductionInfos = new ProductInfo()
                 {
                     Products = products
                 };
 
-                var resultInfo = Bus.Request<ProductInfos,FDP.OrderService.DirectoryMessage.Response.ProductInfos>(reqProductionInfos);
+                var resultInfo =await Bus.RequestAsync<ProductInfo, MessageDirectory.Response.ProductInfo>(reqProductionInfos);
 
                 OrderReadyToDeliver orderReady = new OrderReadyToDeliver()
                 {
                     Address = order.Address,
                     Amount = order.Amount,
                     City = order.City,
-                    CreateDate = order.ConfirmationDate,
-                    DeliveryType = (FDP.OrderService.DirectoryMessage.Shared.Enum.DeliveryType)order.DeliveryType,
+                    CreateDate = order.CreateDate,
+                    DeliveryType = (DeliveryType)order.DeliveryType,
                     Email = order.Email,
                     PayedAmount = order.Amount,
                     PhoneNumber = order.PhoneNumber,
@@ -90,8 +86,13 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
 
                 };
 
-                Bus.Publish(orderReady);
+                await Bus.PublishAsync(orderReady);
             }
+        }
+
+        public void Subscribe()
+        { 
+                Bus.SubscribeAsync<OrderConfirmed>(Consume);
         }
     }
 }
