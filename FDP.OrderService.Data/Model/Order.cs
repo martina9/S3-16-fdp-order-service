@@ -13,32 +13,30 @@ namespace FDP.OrderService.Data.Model
         }
 
         [Key]
-        public int Id { get; set; }  
-                  
-        public int UserId { get; set; }
+        public int Id { get; set; }
 
-        public int RestaurantId { get; set; }
+        [Required]
+        public virtual User User { get; set; }
 
-        [StringLength(155)]
+        [Required]
+        public virtual Restaurant Restaurant { get; set; }
+
         public string Address { get; set; }
 
-        [StringLength(155)]
         public string City { get; set; }
 
-        [StringLength(155)]
         public string PhoneNumber { get; set; }
 
-        [StringLength(155)]
         public string Email { get; set; }
 
         public DeliveryType DeliveryType { get; set; }
 
         [Required]
-        public DateTime ConfirmationDate { get; set; } 
+        public DateTime CreateDate { get; set; } 
 
         [Required]
         public decimal Amount { get; set; }
         
-        public List<Product> Products { get; set; }
+        public virtual List<Product> Products { get; set; }
     }
 }
