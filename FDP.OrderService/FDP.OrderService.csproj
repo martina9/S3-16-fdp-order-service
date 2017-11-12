@@ -191,10 +191,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataUtility.cs" />
+    <Compile Include="MessageDirectory\Class1.cs" />
     <Compile Include="MessageDirectory\Message\OrderReadyToDeliver.cs" />
     <Compile Include="MessageDirectory\Message\OrderDeleted.cs" />
     <Compile Include="MessageDirectory\Message\OrderConfirmed.cs" />
+    <Compile Include="MessageDirectory\Message\RestaurantCreated.cs" />
     <Compile Include="MessageDirectory\Message\UserCreated.cs" />
+    <Compile Include="MessageDirectory\Message\RestaurantDeleted.cs" />
     <Compile Include="MessageDirectory\Message\UserDeleted.cs" />
     <Compile Include="MessageDirectory\Request\CalculatePrice.cs" />
     <Compile Include="MessageDirectory\Request\OrderInfo.cs" />
@@ -218,7 +222,9 @@
     <Compile Include="MessageDirectory\Response\ConfirmOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubScribers\PubSubSubscriber\OrderConfirmedPubSubscriber.cs" />
+    <Compile Include="SubScribers\PubSubSubscriber\RestaurantCreatedPubSubSubScriber.cs" />
     <Compile Include="SubScribers\PubSubSubscriber\UserCreatedPubSubSubScriber.cs" />
+    <Compile Include="SubScribers\PubSubSubscriber\RestaurantDeletedPubSubscriber.cs" />
     <Compile Include="SubScribers\PubSubSubscriber\UserDeletedPubSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\ConfirmOrderRPCSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\DeleteUserRPCSubscriber.cs" />

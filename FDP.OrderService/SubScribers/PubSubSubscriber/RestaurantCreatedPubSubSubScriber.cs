@@ -10,38 +10,36 @@ using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
-    public class UserCreatedPubSubSubScriber : IResponder
+    public class RestaurantCreatedPubSubSubScriber : IResponder
     {
         protected readonly IBusClient Bus;
         protected OrderDataContext dataContext;
-
-        public UserCreatedPubSubSubScriber(IBusClient bus)
+        public RestaurantCreatedPubSubSubScriber(IBusClient bus)
         { 
             this.Bus = bus; 
         }
 
-        public UserCreatedPubSubSubScriber(IBusClient bus, OrderDataContext dataContext)
+        public RestaurantCreatedPubSubSubScriber(IBusClient bus, OrderDataContext dataContext)
         {
             this.Bus = bus;
             this.dataContext = dataContext;
         }
 
-        public async Task Consume(UserCreated message, MessageContext context)
+        public async Task Consume(RestaurantCreated message, MessageContext context)
         {
-            this.dataContext = DataUtility.GetDataContext(dataContext);
+            this.dataContext = DataUtility.GetDataContext(dataContext); ;
             using (dataContext)
             {
-                User user = dataContext.Users.SingleOrDefault(p => p.Email == message.Email);
-                if (user != null) return;
+                Restaurant restaurant = dataContext.Restaurants.SingleOrDefault(p => p.Id == message.Id);
+                if (restaurant != null) return;
 
-                user = new User
+                restaurant = new Restaurant
                 {
-                    Id = message.Id,
-                    Email = message.Email,
-                    Username = message.Username
+                    Id = message.Id, 
+                    Code = message.Code
                 };
 
-                dataContext.Users.Add(user);
+                dataContext.Restaurants.Add(restaurant);
 
                 await dataContext.SaveChangesAsync();
 
@@ -50,7 +48,7 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
 
         public void Subscribe()
         {
-            Bus.SubscribeAsync<UserCreated>(Consume);
+            Bus.SubscribeAsync<RestaurantCreated>(Consume);
         }
     }
 }

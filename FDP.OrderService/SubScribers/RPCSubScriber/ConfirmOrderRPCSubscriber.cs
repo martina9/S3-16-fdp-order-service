@@ -11,24 +11,35 @@ using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
+    /// <summary>
+    /// Subscriber receive a message ConfirmOrder where check user and Restaurant add Order 
+    /// after that publish a message OrderConfirmed 
+    /// </summary>
     public class ConfirmOrderRPCSubscriber : FDP.MessageService.Interface.IResponder
     {
         protected readonly IBusClient Bus;
+        protected OrderDataContext dataContext;
 
         public ConfirmOrderRPCSubscriber(IBusClient bus) 
         {
+            this.Bus = bus; 
+        }
+
+        public ConfirmOrderRPCSubscriber(IBusClient bus, OrderDataContext dataContext)
+        {
             this.Bus = bus;
+            this.dataContext = dataContext;
         }
 
         public async Task<ConfirmOrder> Response(MessageDirectory.Request.ConfirmOrder request, MessageContext context)
         {
             ConfirmOrder response = new ConfirmOrder();
-             
-            using (OrderDataContext dataContext = new OrderDataContext())
+            this.dataContext = DataUtility.GetDataContext(dataContext);
+            using (dataContext)
             { 
                 var user = await dataContext.Users.SingleOrDefaultAsync(p => p.Id == request.UserId);
 
-                if (user != null)
+                if (user == null)
                 {
                     Exception ex = new Exception("User Doesnt not exist");
                     ex.Data.Add("Email",request.UserId); 
@@ -37,7 +48,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
 
                 var restaurant = await dataContext.Restaurants.SingleOrDefaultAsync(p => p.Id == request.RestaurantId);
 
-                if (restaurant != null)
+                if (restaurant == null)
                 {
                     Exception ex = new Exception("Restaurant Doesnt not exist");
                     ex.Data.Add("Id", request.RestaurantId);

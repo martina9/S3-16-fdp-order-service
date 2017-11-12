@@ -11,42 +11,38 @@ using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
-    public class UserDeletedPubSubscriber : IResponder
+    public class RestaurantDeletedPubSubscriber : IResponder
     {
         protected readonly IBusClient Bus;
         protected OrderDataContext dataContext;
-        public UserDeletedPubSubscriber(IBusClient bus)
+        public RestaurantDeletedPubSubscriber(IBusClient bus)
         {
-            this.Bus = bus;
+            this.Bus = bus; 
         }
 
-        public UserDeletedPubSubscriber(IBusClient bus, OrderDataContext dataContext)
+        public RestaurantDeletedPubSubscriber(IBusClient bus, OrderDataContext dataContext)
         {
             this.Bus = bus;
             this.dataContext = dataContext;
         }
-
-        public async Task Consume(UserDeleted message, MessageContext context)
-        {
+        public async Task Consume(RestaurantDeleted message, MessageContext context)
+        { 
             this.dataContext = DataUtility.GetDataContext(dataContext);
             using (dataContext)
             {
-                User user = dataContext.Users.SingleOrDefault(p => p.Email == message.Email);
-                if (user == null)
+                Restaurant restaurant = dataContext.Restaurants.SingleOrDefault(p => p.Id == message.Id);
+                if (restaurant == null)
                 {
-                    Exception ex = new Exception("User Created : not found by Email");
-                    ex.Data.Add("Email", message.Email);
-                    throw ex;
+                    throw new Exception($"restaurant Delete : not found by Code {message.Code} by Id {message.Id}");
                 }
-
-                dataContext.Users.Remove(user);
+                dataContext.Restaurants.Remove(restaurant);
                 await dataContext.SaveChangesAsync();
             }
         }
 
         public void Subscribe()
         {
-            Bus.SubscribeAsync<UserDeleted>(Consume);
+            Bus.SubscribeAsync<RestaurantDeleted>(Consume);
         }
     }
 }

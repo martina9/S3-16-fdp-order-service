@@ -1,10 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using FDP.Infrastructure;
-using FDP.OrderService.Data;
+using System.IO; 
 using Topshelf;
-
+using FDP.MessageService;
+using FDP.OrderService.Data;
+using System.Linq;
 namespace FDP.OrderService
 {
     public class Program
@@ -18,11 +17,9 @@ namespace FDP.OrderService
 
             using (OrderDataContext test = new OrderDataContext())
             {
-                var contex = test.Orders.FirstOrDefault();
+                var result = test.Users.FirstOrDefault();
             }
-
-
-
+            
             HostFactory.Run(x =>
             { 
                 x.Service<ServiceWindsor>();

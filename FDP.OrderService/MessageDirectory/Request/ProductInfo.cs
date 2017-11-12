@@ -6,8 +6,8 @@ using RawRabbit.Configuration.Exchange;
 namespace FDP.OrderService.MessageDirectory.Request
 {  
     [Exchange(Type = ExchangeType.Direct, Name = "rpc.exchange")]
-    [Queue(Name = "FDP.OrderService.MessageDirectory:Request.ProductInfo")]
-    [Routing(RoutingKey = "FDP.OrderService.MessageDirectory:Request.ProductInfo", PrefetchCount = 1)]
+    [Queue(Name = "FDP.ProductService.MessageDirectory:Request.ProductInfo")]
+    [Routing(RoutingKey = "FDP.ProductService.MessageDirectory:Request.ProductInfo")]
     public class ProductInfo
     {
         public ProductInfo()

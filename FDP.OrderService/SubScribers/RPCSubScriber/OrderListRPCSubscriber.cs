@@ -14,17 +14,26 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
     public class OrderListRPCSubscriber  : IResponder
     {
         protected readonly IBusClient Bus;
+        protected OrderDataContext dataContext;
 
         public OrderListRPCSubscriber(IBusClient bus)
         {
             this.Bus = bus;
+            dataContext = new OrderDataContext();  
+        }
+
+        public OrderListRPCSubscriber(IBusClient bus, OrderDataContext dataContext)
+        {
+            this.dataContext = dataContext;
+            this.Bus = bus;
+
         }
 
         public async Task<OrderList> Response(MessageDirectory.Request.OrderList request, MessageContext context)
         {
             OrderList response = new OrderList();
 
-            using (OrderDataContext dataContext = new OrderDataContext())
+            using (dataContext)
             {
                 var orders = await dataContext.Orders.Where(p => (request.UserId == null || p.User.Id == request.UserId) && (request.RestaurantId == null || p.Restaurant.Id == request.RestaurantId)).ToListAsync();
 

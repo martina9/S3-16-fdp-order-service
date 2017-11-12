@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FDP.OrderService.Data;
-using FDP.OrderService.Data.Model;
-using FDP.MessageService.Responders;
+using System.Data.Entity;
 using RawRabbit;
 using System.Threading.Tasks;
 using FDP.MessageService.Interface;
@@ -31,18 +30,17 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
         /// <param name="message"></param>
         /// <returns></returns> 
         public async Task Consume(OrderConfirmed message,MessageContext context)
-        {
+        { 
             using (OrderDataContext dataContext = new OrderDataContext())
             {
-                Data.Model.Order order = dataContext.Orders.SingleOrDefault(p => p.Id == message.Id);
+                Data.Model.Order order = dataContext.Orders.Include(p=>p.Products).SingleOrDefault(p => p.Id == message.Id);
                 if (order == null)
                 {
                     Exception ex = new Exception("Order not found");
                     ex.Data.Add("OrderId", message.Id);
                     throw ex;
                 }
-
-               
+                               
                 var calcualtePrice = new CalculatePrice()
                 {
                     Products = order.Products.Select(p => new Product()
@@ -52,12 +50,10 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     }).ToList()
                 };
 
-                var calculatedPrice = await Bus.RequestAsync<CalculatePrice, MessageDirectory.Response.CalculatePrice>(calcualtePrice);
-
-                order.Amount = calculatedPrice.TotalAmount;
-
-                dataContext.SaveChanges();
-
+                //Wait for resolve Notified bug in library ticket id #56487 for adding GUID in exchange
+                //var calculatedPrice = await Bus.RequestAsync<CalculatePrice, MessageDirectory.Response.CalculatePrice>(calcualtePrice);
+                //order.Amount = calculatedPrice.TotalAmount;
+                //dataContext.SaveChanges();
 
                 var products = order.Products.Select(o => new Product() { ProductId = o.ProductId, Quantity = o.Quantity }).ToList();
 
@@ -66,9 +62,8 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     Products = products
                 };
 
-                var resultInfo =await Bus.RequestAsync<ProductInfo, MessageDirectory.Response.ProductInfo>(reqProductionInfos);
-
-                OrderReadyToDeliver orderReady = new OrderReadyToDeliver()
+                // var resultInfo = await Bus.RequestAsync<ProductInfo, MessageDirectory.Response.ProductInfo>(reqProductionInfos);
+                 OrderReadyToDeliver orderReady = new OrderReadyToDeliver()
                 {
                     Address = order.Address,
                     Amount = order.Amount,
@@ -78,11 +73,11 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     Email = order.Email,
                     PayedAmount = order.Amount,
                     PhoneNumber = order.PhoneNumber,
-                    ProductsToPrepare = resultInfo.Products.Select(p => new ProductToPrepare()
-                    {
-                        ProductName = p.ProductName,
-                        Quantity = p.Quantity
-                    }).ToList()
+                    //ProductsToPrepare = resultInfo.Products.Select(p => new ProductToPrepare()
+                    //{
+                    //    ProductName = p.ProductName,
+                    //    Quantity = p.Quantity
+                    //}).ToList()
 
                 };
 
@@ -92,7 +87,7 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
 
         public void Subscribe()
         { 
-                Bus.SubscribeAsync<OrderConfirmed>(Consume);
+            Bus.SubscribeAsync<OrderConfirmed>(Consume);
         }
     }
 }

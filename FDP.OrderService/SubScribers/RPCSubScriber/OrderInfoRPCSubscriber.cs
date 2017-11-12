@@ -14,17 +14,23 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
     public class OrderInfoRPCSubscriber  :  FDP.MessageService.Interface.IResponder
     {
         protected readonly IBusClient Bus;
+        private OrderDataContext dataContext;
 
         public OrderInfoRPCSubscriber(IBusClient bus)
         {
             this.Bus = bus;
         }
 
+        public OrderInfoRPCSubscriber(IBusClient bus, OrderDataContext dataContext)
+        {
+            this.dataContext = dataContext;
+            this.Bus = bus;
+        }
+
         public async Task<OrderInfo> Response(MessageDirectory.Request.OrderInfo request, MessageContext context)
         {
-            
-
-            using (OrderDataContext dataContext = new OrderDataContext())
+            this.dataContext = DataUtility.GetDataContext(dataContext);
+            using (dataContext)
             {
                 var order = await dataContext.Orders.SingleOrDefaultAsync(p => p.Id == request.Id);
 
@@ -34,6 +40,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     ex.Data.Add("Id", request.Id); 
                     throw ex;
                 }
+
                 OrderInfo response = new OrderInfo
                 {
                     Id = order.Id,
@@ -51,12 +58,10 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                         Quantity = p.Quantity,
                         ProductId = p.ProductId
                     }).ToList()
-                };
+                }; 
 
                 return response;
-            }
-
-            
+            } 
         }
 
         public void Subscribe()

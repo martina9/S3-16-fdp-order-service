@@ -1,0 +1,60 @@
+﻿[
+  {
+    "Id": 1,
+    "User": {
+      "Username": "testOrdine",
+      "Email": "testOrdine@email.it"
+    },
+    "Restaurant": {
+      "Id": 1,
+      "Code": "CODE"
+    },
+    "Address": "via del test",
+    "City": "città del test",
+    "PhoneNumber": "012345670",
+    "Email": "testOrdine@email.it",
+    "DeliveryType": "DeliveryHome",
+    "CreateDate": "2017-11-11T21:43:22.9916564+01:00",
+    "Amount": 43.0,
+    "Products": [
+      {
+        "ProductId": 1,
+        "Quantity": 12
+      },
+      {
+        "ProductId": 2,
+        "Quantity": 1
+      }
+    ]
+  },
+
+  {
+    "Id": 2,
+    "User": {
+      "Id": 0,
+      "Username": "testOrdine",
+      "Email": "testOrdine@email.it"
+    },
+    "Restaurant": {
+      "Id": 1,
+      "Code": "CODE"
+    },
+    "Address": "via del test",
+    "City": "città del test",
+    "PhoneNumber": "012345670",
+    "Email": "testOrdine@email.it",
+    "DeliveryType": "DeliveryHome",
+    "CreateDate": "2017-11-11T21:43:22.9916564+01:00",
+    "Amount": 43.0,
+    "Products": [
+      {
+        "ProductId": 1,
+        "Quantity": 12
+      },
+      {
+        "ProductId": 2,
+        "Quantity": 1
+      }
+    ]
+  }
+]
