@@ -7,7 +7,7 @@ namespace FDP.OrderService.Data.Model
 {
     public class User
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         [Required]

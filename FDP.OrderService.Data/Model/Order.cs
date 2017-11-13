@@ -13,9 +13,13 @@ namespace FDP.OrderService.Data.Model
         }
 
         [Key]
-        public int Id { get; set; }  
-                 
-        public int UserId { get; set; } 
+        public int Id { get; set; }
+
+        [Required]
+        public virtual User User { get; set; }
+
+        [Required]
+        public virtual Restaurant Restaurant { get; set; }
 
         public string Address { get; set; }
 
@@ -33,6 +37,6 @@ namespace FDP.OrderService.Data.Model
         [Required]
         public decimal Amount { get; set; }
         
-        public List<Product> Products { get; set; }
+        public virtual List<Product> Products { get; set; }
     }
 }

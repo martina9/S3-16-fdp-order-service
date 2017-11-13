@@ -2,30 +2,32 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using EasyNetQ;
-using FDP.Infrastructure.Responders;
+
 using FDP.OrderService.Data;
 using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Response;
+using FDP.MessageService.Interface;
+using FDP.OrderService.MessageDirectory.Response;
+using RawRabbit.Context;
+using RawRabbit;
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
     public class UpdateUserRPCSubscriber : IResponder
     {
-        protected readonly IBus Bus;
+        protected readonly IBusClient Bus;
 
-        public UpdateUserRPCSubscriber(IBus bus) 
+        public UpdateUserRPCSubscriber(IBusClient bus) 
         {
             this.Bus = bus;
         }
 
-        public async Task<UpdateOrder> Response(DirectoryMessage.Request.UpdateOrder request)
+        public async Task<UpdateOrder> Response(MessageDirectory.Request.UpdateOrder request, MessageContext context)
         {
             UpdateOrder response = new UpdateOrder();
 
-            using (OrderDataContext context = new OrderDataContext())
+            using (OrderDataContext dataContext = new OrderDataContext())
             {
-                var order = await context.Orders.SingleOrDefaultAsync(p => p.Id == request.Id);
+                var order = await dataContext.Orders.SingleOrDefaultAsync(p => p.Id == request.Id);
                 if (order == null)
                 {
                     Exception ex = new Exception("Update Order : Does not exist");
@@ -40,7 +42,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                 order.Address = request.Address;
                 order.City = request.City;
 
-                context.Products.RemoveRange(order.Products); 
+                dataContext.Products.RemoveRange(order.Products); 
                 order.Products.Clear();
 
                 order.Products = request.Products.Select(p => new Product()
@@ -49,7 +51,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     Quantity = p.Quantity
                 }).ToList();
 
-               await context.SaveChangesAsync();
+               await dataContext.SaveChangesAsync();
 
             response.Id = order.Id; 
             return response;
@@ -57,7 +59,7 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
         }
         public void Subscribe()
         {
-            this.Bus.RespondAsync<DirectoryMessage.Request.UpdateOrder, UpdateOrder>(this.Response);
+            this.Bus.RespondAsync<MessageDirectory.Request.UpdateOrder, UpdateOrder>(this.Response);
         }
     }
 }

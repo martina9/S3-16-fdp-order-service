@@ -1,35 +1,52 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using EasyNetQ;
-using EasyNetQ.AutoSubscribe;
+using FDP.MessageService.Interface;
 using FDP.OrderService.Data;
 using FDP.OrderService.Data.Model;
-using FDP.OrderService.DirectoryMessage.Message;
+using FDP.MessageService.Responders;
+using FDP.OrderService.MessageDirectory.Message;
+using RawRabbit;
+using RawRabbit.Context;
 
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
-    public class UserDeletedPubSubscriber : IConsumeAsync<UserDeleted>
+    public class UserDeletedPubSubscriber : IResponder
     {
-        protected readonly IBus Bus;
-
-        public UserDeletedPubSubscriber(IBus bus)
+        protected readonly IBusClient Bus;
+        protected OrderDataContext dataContext;
+        public UserDeletedPubSubscriber(IBusClient bus)
         {
             this.Bus = bus;
         }
 
-        [AutoSubscriberConsumer(SubscriptionId = "Id")]
-        public async Task Consume(UserDeleted message)
+        public UserDeletedPubSubscriber(IBusClient bus, OrderDataContext dataContext)
         {
-            using (OrderDataContext context = new OrderDataContext())
+            this.Bus = bus;
+            this.dataContext = dataContext;
+        }
+
+        public async Task Consume(UserDeleted message, MessageContext context)
+        {
+            this.dataContext = DataUtility.GetDataContext(dataContext);
+            using (dataContext)
             {
-                User user = context.Users.SingleOrDefault(p => p.Email == message.Email);
+                User user = dataContext.Users.SingleOrDefault(p => p.Email == message.Email);
                 if (user == null)
-                    throw new Exception($"User Created : Image not found by Path {message.Email}");
-                 
-                context.Users.Remove(user);
-                await context.SaveChangesAsync();
+                {
+                    Exception ex = new Exception("User Created : not found by Email");
+                    ex.Data.Add("Email", message.Email);
+                    throw ex;
+                }
+
+                dataContext.Users.Remove(user);
+                await dataContext.SaveChangesAsync();
             }
+        }
+
+        public void Subscribe()
+        {
+            Bus.SubscribeAsync<UserDeleted>(Consume);
         }
     }
 }

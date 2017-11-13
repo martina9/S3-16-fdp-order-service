@@ -1,29 +1,19 @@
 ﻿using System;
 using System.Configuration;
-using System.IO;
-using EasyNetQ;
-using FDP.OrderService.DirectoryMessage.Message;
-using FDP.OrderService.SubScribers.PubSubSubscriber;
+using System.IO; 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FakeItEasy;
-using FDP.OrderService.Data;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using FDP.OrderService.Data.Model;
-using FDP.OrderService.Test.JsonData;
-using System.Linq;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using RawRabbit;
+using FDP.MessageService.Installers;
+using FDP.OrderService.MessageDirectory.Request;
+using FDP.OrderService.SubScribers.RPCSubScriber;
+using RawRabbit.Context;
 
 namespace FDP.OrderService.Test
 {
     [TestClass]
     public class UnitTest1
     {
-        public IBus bus;
-        private OrderService.Data.OrderDataContext dataContext;
-        private IList<Order> _orders;
-        private IList<User> _users;
+        public IBusClient bus;
 
         [TestInitialize]
         public void Init()
@@ -39,32 +29,36 @@ namespace FDP.OrderService.Test
                     throw new Exception("easynetq connection string is missing or empty");
                 }
 
-                bus = RabbitHutch.CreateBus(connectionString); 
+                bus = BusBuilder.CreateMessageBus(); 
             }
+        }
+        //[TestMethod]
+        //public void TestMethod1()
+        //{
+        //    var message = new  UserCreated();
+        //    message.Email = "test.test@test.com";
+        //    message.Username = "test.test";
+        //    var user = new UserCreatedPubSubSubScriber(bus);
+        //    var result = user.Consume(message);
+        //    result.Wait();
+        //}
 
-            // create test data
-            this._orders = JsonLoad.Orders();
-            this._users = JsonLoad.Users();
-            // setup DbSet
-            var orders = A.Fake<DbSet<Order>>(o => o.Implements(typeof(IQueryable<Order>)).Implements(typeof(IDbAsyncEnumerable<Order>))).SetupData(this._orders); 
-            var users = A.Fake<DbSet<User>>(o => o.Implements(typeof(IQueryable<User>)).Implements(typeof(IDbAsyncEnumerable<User>))).SetupData(this._users);
-            // arrange
-            this.dataContext = A.Fake<OrderDataContext>();
-            A.CallTo(() => dataContext.Orders).Returns(orders);
-            A.CallTo(() => dataContext.Users).Returns(users);
+        [TestMethod]
+        public void OrderListMessageTest()
+        {
+           OrderList orderList = new OrderList();
+            orderList.RestaurantId = 1;
+
+            var result = bus.RequestAsync<OrderList, FDP.OrderService.MessageDirectory.Response.OrderList>(orderList).Result;
         }
 
         [TestMethod]
-        public void UserCreatedFound()
+        public void OrderListConsumeTest()
         {
-            var message = new UserCreated
-            {
-                Email = "test@email.com",
-                Username = "test1"
-            };
-            var user = new UserCreatedPubSubSubScriber(bus,dataContext);
-            user.Consume(message);  
-            Assert.Fail();
-        } 
+            OrderList orderList = new OrderList();
+            orderList.RestaurantId = 1;
+            var sub = new OrderListRPCSubscriber(bus);
+            var result = sub.Response(orderList, new MessageContext(){GlobalRequestId = Guid.NewGuid()}).Result;
+        }
     }
 }

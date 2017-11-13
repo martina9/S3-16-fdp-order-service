@@ -14,7 +14,13 @@ namespace FDP.OrderService.Data
                 }
             }
 
-            public BaseDataContext(DbConnection dbConnection, bool contextOwnsConnection)
+        public bool IsDisposed { get; private set; }
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+        }
+
+        public BaseDataContext(DbConnection dbConnection, bool contextOwnsConnection)
                 : base(dbConnection, contextOwnsConnection)
             {
                 //Database.Log = logInfo => DatabaseLogger.Log(logInfo);

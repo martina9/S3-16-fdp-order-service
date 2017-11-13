@@ -13,13 +13,12 @@ namespace FDP.OrderService.Data
             public OrderDataContext(DbConnection dbConnection, bool contextOwnsConnection)
                 : base(dbConnection, contextOwnsConnection)
             {
-                Database.SetInitializer(new MigrateDatabaseToLatestVersion<OrderDataContext, Configuration>(true));
+                Database.SetInitializer(new MigrateDatabaseToLatestVersion<OrderDataContext, FDP.OrderService.Data.Migrations.Configuration>(true));
 
                 this.SessionID = Guid.NewGuid(); 
             }
 
-            public OrderDataContext()
-                : base("OrderServiceDataContext")
+            public OrderDataContext() : base("OrderServiceDataContext")
             {
                 this.SessionID = Guid.NewGuid();
 
@@ -32,9 +31,12 @@ namespace FDP.OrderService.Data
 
             public virtual DbSet<User> Users { get; set; }
             public virtual DbSet<Order> Orders { get; set; }
+            public virtual DbSet<Restaurant> Restaurants { get; set; }
             public virtual DbSet<Product> Products { get; set; }
 
         #region DbContext override
+
+      
 
         public override int SaveChanges()
             {
