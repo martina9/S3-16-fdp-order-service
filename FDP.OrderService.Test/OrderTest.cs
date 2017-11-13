@@ -66,7 +66,7 @@ namespace FDP.OrderService.Test
           
 
         [TestMethod]
-        public async Task get_order_list()
+        public async Task Get_order_list()
         {  
             //Act
             var list = await dataContext.Orders.ToListAsync();
