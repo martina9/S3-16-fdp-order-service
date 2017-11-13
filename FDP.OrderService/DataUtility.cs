@@ -15,7 +15,10 @@ namespace FDP.OrderService
             {
                 dataContext = new OrderDataContext();
             }
-
+            else if(dataContext.IsDisposed)
+            {
+                dataContext = new OrderDataContext();
+            } 
             return dataContext;
         }
     }

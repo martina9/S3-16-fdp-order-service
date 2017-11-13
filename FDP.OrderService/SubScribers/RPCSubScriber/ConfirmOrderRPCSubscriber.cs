@@ -8,6 +8,10 @@ using FDP.OrderService.MessageDirectory.Message;
 using FDP.OrderService.MessageDirectory.Response;
 using RawRabbit;
 using RawRabbit.Context;
+using RawRabbit.Extensions.Client;
+using RawRabbit.Extensions.TopologyUpdater;
+using FDP.MessageService.Interface;
+using RawRabbit.Configuration.Exchange; 
 
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
@@ -17,15 +21,15 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
     /// </summary>
     public class ConfirmOrderRPCSubscriber : FDP.MessageService.Interface.IResponder
     {
-        protected readonly IBusClient Bus;
+        protected readonly RawRabbit.IBusClient Bus;
         protected OrderDataContext dataContext;
 
-        public ConfirmOrderRPCSubscriber(IBusClient bus) 
+        public ConfirmOrderRPCSubscriber(RawRabbit.IBusClient bus) 
         {
             this.Bus = bus; 
         }
 
-        public ConfirmOrderRPCSubscriber(IBusClient bus, OrderDataContext dataContext)
+        public ConfirmOrderRPCSubscriber(RawRabbit.IBusClient bus, OrderDataContext dataContext)
         {
             this.Bus = bus;
             this.dataContext = dataContext;
@@ -82,6 +86,8 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
                     Id = order.Id
                 };
 
+                response.id = order.Id;
+
                 await Bus.PublishAsync(orderConfiremd);
             }
 
@@ -89,8 +95,9 @@ namespace FDP.OrderService.SubScribers.RPCSubScriber
         }
 
         public void Subscribe()
-        {
+        { 
             this.Bus.RespondAsync<MessageDirectory.Request.ConfirmOrder, ConfirmOrder>(Response);
         }
     }
+     
 }

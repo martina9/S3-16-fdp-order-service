@@ -24,7 +24,7 @@ namespace FDP.OrderService.Test
     [TestClass]
     public class OrderTest
     {
-        public IBusClient bus;
+        public RawRabbit.IBusClient bus;
         public IBusClient fakeBus;
         private OrderDataContext dataContext;
         private IList<Order> orders;
@@ -63,7 +63,8 @@ namespace FDP.OrderService.Test
             A.CallTo(() => dataContext.Restaurants).Returns(setRestaurant);
 
         }
-         
+          
+
         [TestMethod]
         public async Task get_order_list()
         {  

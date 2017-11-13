@@ -12,7 +12,6 @@ using FDP.OrderService.MessageDirectory.Shared.Enum;
 using RawRabbit.Context;
 using Product = FDP.OrderService.MessageDirectory.Shared.Product;
 using ProductInfo = FDP.OrderService.MessageDirectory.Request.ProductInfo;
-
 namespace FDP.OrderService.SubScribers.PubSubSubscriber
 {
     public class OrderConfirmedPubSubscriber :  IResponder
@@ -62,7 +61,7 @@ namespace FDP.OrderService.SubScribers.PubSubSubscriber
                     Products = products
                 };
 
-                // var resultInfo = await Bus.RequestAsync<ProductInfo, MessageDirectory.Response.ProductInfo>(reqProductionInfos);
+               //var resultInfo = await Bus.RequestAsync<ProductInfo, MessageDirectory.Response.ProductInfo>(reqProductionInfos);
                  OrderReadyToDeliver orderReady = new OrderReadyToDeliver()
                 {
                     Address = order.Address,

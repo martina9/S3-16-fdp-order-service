@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDP.OrderService", "FDP.OrderService\FDP.OrderService.csproj", "{91F8F41A-B17F-4C9D-B333-8C6EB0CC4C07}"
 EndProject
@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{2758
 		..\FDP.MessageService\bin\x64\Debug\FDP.MessageService.dll.config = ..\FDP.MessageService\bin\x64\Debug\FDP.MessageService.dll.config
 		..\FDP.MessageService\bin\x64\Debug\FDP.MessageService.pdb = ..\FDP.MessageService\bin\x64\Debug\FDP.MessageService.pdb
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDP.MessageService", "..\..\FDP.MessageService\FDP.MessageService.csproj", "{F19AFE42-ED9E-4007-B47F-0B864DD06F21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +36,6 @@ Global
 		{E4981531-BEAD-4A65-ADF4-1CE06EC61BE0}.Debug|x64.Build.0 = Debug|x64
 		{E4981531-BEAD-4A65-ADF4-1CE06EC61BE0}.Release|x64.ActiveCfg = Release|Any CPU
 		{E4981531-BEAD-4A65-ADF4-1CE06EC61BE0}.Release|x64.Build.0 = Release|Any CPU
-		{F19AFE42-ED9E-4007-B47F-0B864DD06F21}.Debug|x64.ActiveCfg = Debug|x64
-		{F19AFE42-ED9E-4007-B47F-0B864DD06F21}.Debug|x64.Build.0 = Debug|x64
-		{F19AFE42-ED9E-4007-B47F-0B864DD06F21}.Release|x64.ActiveCfg = Release|x64
-		{F19AFE42-ED9E-4007-B47F-0B864DD06F21}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,6 +5,6 @@ namespace FDP.OrderService.MessageDirectory.Response
     public class ConfirmOrder
     {
         [Required]
-        public int? Id { get; set; } 
+        public int? id { get; set; } 
     }
 }

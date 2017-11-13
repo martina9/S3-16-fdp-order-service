@@ -7,6 +7,7 @@ using FDP.OrderService.MessageDirectory.Message;
 using FDP.OrderService.MessageDirectory.Response;
 using RawRabbit.Context;
 
+
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
     public class DeleteUserRPCSubscriber : FDP.MessageService.Interface.IResponder

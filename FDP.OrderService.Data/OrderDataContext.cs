@@ -29,10 +29,10 @@ namespace FDP.OrderService.Data
 
             public Guid SessionID { get; private set; }
 
-            public DbSet<User> Users { get; set; }
-            public DbSet<Order> Orders { get; set; }
-            public DbSet<Restaurant> Restaurants { get; set; }
-            public DbSet<Product> Products { get; set; }
+            public virtual DbSet<User> Users { get; set; }
+            public virtual DbSet<Order> Orders { get; set; }
+            public virtual DbSet<Restaurant> Restaurants { get; set; }
+            public virtual DbSet<Product> Products { get; set; }
 
         #region DbContext override
 

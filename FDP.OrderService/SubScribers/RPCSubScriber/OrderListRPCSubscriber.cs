@@ -9,6 +9,7 @@ using RawRabbit.Context;
 using FDP.OrderService.MessageDirectory.Shared;
 using FDP.OrderService.MessageDirectory.Shared.Enum;
 
+
 namespace FDP.OrderService.SubScribers.RPCSubScriber
 {
     public class OrderListRPCSubscriber  : IResponder

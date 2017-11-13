@@ -9,8 +9,8 @@ using RawRabbit.Configuration.Exchange;
 namespace FDP.OrderService.MessageDirectory.Request
 {  
     [Exchange(Type = ExchangeType.Direct,  Name = "rpc.exchange")]
-    [Queue(Name = "FDP.OrderService.MessageDirectory:Request.ConfirmOrder",Durable = true,AutoDelete = false,Exclusive = false)]
-    [Routing(RoutingKey = "FDP.OrderService.MessageDirectory:Request.ConfirmOrder", PrefetchCount = 1)]
+    [Queue(Name = "FDP.OrderService.MessageDirectory:Request.ConfirmOrder",AutoDelete = false, Durable = true)]
+    [Routing(RoutingKey = "FDP.OrderService.MessageDirectory:Request.ConfirmOrder")]
     public class ConfirmOrder
     {
         public ConfirmOrder()
@@ -26,9 +26,7 @@ namespace FDP.OrderService.MessageDirectory.Request
 
         [Required]
         public decimal? Amount { get; set; }
-
-        [Required]
-        public DateTime? ConfirmationDate { get; set; } 
+         
 
         [Required]
         public DeliveryType DeliveryType { get; set; }
