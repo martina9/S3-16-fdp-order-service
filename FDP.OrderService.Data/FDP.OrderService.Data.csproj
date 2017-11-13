@@ -121,15 +121,6 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="OrderServiceDataContext.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="OrderServiceDataContext_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>OrderServiceDataContext.mdf</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Migrations\201710041633389_init.resx">
       <DependentUpon>201710041633389_init.cs</DependentUpon>
     </EmbeddedResource>

@@ -88,9 +88,9 @@
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FDP.MessageService, Version=1.0.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="FDP.MessageService, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\FDP.OrderService\Library\FDP.MessageService.dll</HintPath>
+      <HintPath>..\Library\FDP.MessageService.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.1.2.10\lib\2.0\log4net.dll</HintPath>
@@ -232,7 +232,9 @@
     <Compile Include="SubScribers\RPCSubScriber\OrderInfoRPCSubscriber.cs" />
     <Compile Include="SubScribers\RPCSubScriber\UpdateUserRPCSubscriber.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\Library\FDP.MessageService.dll" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
